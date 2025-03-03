@@ -8,58 +8,81 @@ const AppContextProvider = (props) => {
   const currencySymbol = "₹";
 
   const [doctors, setDoctors] = useState([]);
-  const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : ""
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [userData, setUserData] = useState(
+    JSON.parse(localStorage.getItem("userData")) || null
   );
-  const [userData, setUserData] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Getting Doctors Data
+  // Fetch Doctors Data
   const getDoctorsData = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        "https://prescripto-backend-1af3.onrender.com/api/doctor/list"
-      );
+      const { data } = await axios.get("http://localhost:4000/api/doctor/list");
       if (data.success) {
         setDoctors(data.doctors);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.error("Error fetching doctors:", error);
+      toast.error("Failed to fetch doctors.");
     } finally {
       setLoading(false);
     }
   };
 
-  // getting user profile
+  // Fetch User Profile Data
   const loadUserProfileData = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("🚨 No token found in local storage!");
+      toast.error("Session expired. Please log in again.");
+      return;
+    }
+  
     try {
       const { data } = await axios.get(
-        "https://prescripto-backend-1af3.onrender.com/api/user/get-profile",
-        { headers: { token } }
+        "http://localhost:4000/api/user/get-profile",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-
+  
       if (data.success) {
-        setUserData(data.userData);
+        setUserData(data.userData); // ✅ Ensure state updates
+        localStorage.setItem("userData", JSON.stringify(data.userData));
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.error("🚨 Error fetching user profile:", error);
+      toast.error("Failed to load user profile.");
     }
   };
+  
 
+  // Load data on mount
   useEffect(() => {
     getDoctorsData();
   }, []);
 
+  // Load user profile when token changes
   useEffect(() => {
     if (token) {
       loadUserProfileData();
+    } else {
+      setUserData(null);
+      localStorage.removeItem("userData");
+    }
+  }, [token]);
+
+  // Update localStorage when token or userData changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
     }
   }, [token]);
 

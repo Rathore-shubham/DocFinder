@@ -190,6 +190,61 @@ const doctorDashboard = async (req, res) => {
     }
 }
 
+
+const getDoctorsByCity = async (req, res) => {
+    try {
+        const { city } = req.query;
+
+        if (!city) {
+            return res.status(400).json({ success: false, message: "City is required" });
+        }
+
+        const doctors = await Doctor.find({ location: city });
+
+        res.status(200).json({ success: true, doctors });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get doctors within a certain radius (e.g., 10 km)
+const getNearbyDoctors = async (req, res) => {
+    try {
+        const { userLocation } = req.query;
+
+        if (!userLocation) {
+            return res.status(400).json({ success: false, message: "User location is required" });
+        }
+
+        const doctors = await Doctor.find({
+            location: { $regex: new RegExp(userLocation, "i") }  // Case-insensitive search
+        });
+
+        res.status(200).json({ success: true, doctors });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get appointments for a doctor
+const getAppointmentsByDoctor = async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+
+        if (!doctorId) {
+            return res.status(400).json({ success: false, message: "Doctor ID is required" });
+        }
+
+        const appointments = await Appointment.find({ doctorId });
+
+        res.status(200).json({ success: true, appointments });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
 export {
     loginDoctor,
     appointmentsDoctor,
@@ -199,5 +254,8 @@ export {
     appointmentComplete,
     doctorDashboard,
     doctorProfile,
-    updateDoctorProfile
+    updateDoctorProfile,
+    getDoctorsByCity,     
+    getNearbyDoctors,     
+    getAppointmentsByDoctor
 }

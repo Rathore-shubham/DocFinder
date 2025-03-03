@@ -7,6 +7,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { token, setToken, userData } = useContext(AppContext);
 
   const logout = () => {
@@ -29,53 +30,57 @@ const Navbar = () => {
       <ul className="md:flex bg-zinc-900 items-start gap-5 font-medium hidden">
         <NavLink to={"/"}>
           <li className="py-1">Home</li>
-          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
         <NavLink to={"/doctors"}>
           <li className="py-1">All Doctors</li>
-          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
         <NavLink to={"/about"}>
           <li className="py-1">About</li>
-          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
         <NavLink to={"/contact"}>
           <li className="py-1">Contact</li>
-          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
       </ul>
       <div className="flex items-center gap-4">
         {token && userData ? (
-          <div className="flex items-center gap-2 cursor-pointer group relative">
-            <img
-              className="w-8 rounded-full"
-              src={assets.profile_pic}
-              alt="profile_pic"
-            />
-            <img
-              className="w-2.5"
-              src={assets.dropdown_icon}
-              alt="dropdown_icon"
-            />
-            <div className="absolute top-0 right-0 py-14 text-base font-medium text-gray-600 hidden group-hover:block">
-              <div className="min-w-48 bg-zinc-800 text-white rounded flex flex-col gap-4 p-4">
+          <div className="relative">
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <img
+                className="w-8 rounded-full"
+                src={assets.profile_pic}
+                alt="profile_pic"
+              />
+              <img
+                className="w-2.5"
+                src={assets.dropdown_icon}
+                alt="dropdown_icon"
+              />
+            </div>
+            {dropdownOpen && (
+              <div className="absolute top-full right-0 py-2 text-base font-medium text-gray-600 bg-zinc-800 text-white rounded flex flex-col gap-4 p-4 min-w-48 z-50 shadow-lg">
                 <p
                   onClick={() => navigate("/my-profile")}
-                  className="hover:ext-zinc-400 cursor-pointer"
+                  className="hover:text-zinc-400 cursor-pointer"
                 >
                   Profile
                 </p>
                 <p
                   onClick={() => navigate("/my-appointments")}
-                  className="hover:ext-zinc-400 cursor-pointer"
+                  className="hover:text-zinc-400 cursor-pointer"
                 >
                   Appointments
                 </p>
-                <p onClick={logout} className="hover:text-zinc-400 cursor-pointer">
+                <p
+                  onClick={logout}
+                  className="hover:text-zinc-400 cursor-pointer"
+                >
                   Logout
                 </p>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <button
@@ -85,6 +90,7 @@ const Navbar = () => {
             Create Account
           </button>
         )}
+
         <img
           onClick={() => setShowMenu(true)}
           className="w-6 md:hidden"

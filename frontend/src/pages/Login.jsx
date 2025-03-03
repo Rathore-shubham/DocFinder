@@ -16,38 +16,55 @@ const Login = () => {
   const navigate = useNavigate();
   const { token, setToken } = useContext(AppContext);
 
+  const validateUsername = (name) => {
+    return !name.includes("-");
+  };
+
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
+
+    if (state === "Sign Up" && !validateUsername(name)) {
+      toast.error("Username should not contain hyphens (-).");
+      setLoading(false);
+      return;
+    }
+
     try {
-      if (state === "Sign Up") {
-        const { data } = await axios.post(
-          "https://prescripto-backend-1af3.onrender.com/api/user/register",
-          { name, email, password }
-        );
+      const endpoint =
+        state === "Sign Up"
+          ? "http://localhost:4000/api/user/register"
+          : "http://localhost:4000/api/user/login";
 
-        if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-        } else {
-          toast.error(data.message);
-        }
+      const payload =
+        state === "Sign Up"
+          ? { name, email, password }
+          : { email, password };
+
+      const { data } = await axios.post(endpoint, payload);
+
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        setToken(data.token);
+
+        toast.success(state === "Sign Up" ? "Registration successful!" : "Login successful!");
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
       } else {
-        const { data } = await axios.post(
-          "https://prescripto-backend-1af3.onrender.com/api/user/login",
-          { email, password }
-        );
-
-        if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-        } else {
-          toast.error(data.message);
-        }
+        toast.error(data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.error("Error:", error);
+
+      if (error.response) {
+        toast.error(error.response.data.message || "Something went wrong!");
+      } else if (error.request) {
+        toast.error("No response from server. Please check your backend.");
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -55,13 +72,11 @@ const Login = () => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-  
-    // Only redirect if token exists AND React state (token) is set
+
     if (storedToken && token) {
       navigate("/");
     }
-  }, [token]); // Run when `token` state updates
-  
+  }, [token]);
 
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
@@ -69,13 +84,11 @@ const Login = () => {
         <p className="text-2xl font-semibold">
           {state === "Sign Up" ? "Create Account" : "Login"}
         </p>
-        <p>
-          Please {state === "Sign Up" ? "sign up" : "log in"} to book
-          appointment
-        </p>
-        {state === "Sign Up" ? (
-          <div className="w-full ">
-            <p>Full Name</p>
+        <p>Please {state === "Sign Up" ? "sign up" : "log in"} to continue</p>
+
+        {state === "Sign Up" && (
+          <div className="w-full">
+            <p>Username</p>
             <input
               onChange={(e) => setName(e.target.value)}
               value={name}
@@ -84,8 +97,9 @@ const Login = () => {
               required
             />
           </div>
-        ) : null}
-        <div className="w-full ">
+        )}
+
+        <div className="w-full">
           <p>Email</p>
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -95,7 +109,7 @@ const Login = () => {
             required
           />
         </div>
-        <div className="w-full ">
+        <div className="w-full">
           <p>Password</p>
           <input
             onChange={(e) => setPassword(e.target.value)}
@@ -107,11 +121,11 @@ const Login = () => {
         </div>
         <div className="flex justify-between text-sm">
           <p className="flex gap-1">
-            Show Password{" "}
+            Show Password
             <input
               type="checkbox"
               className="cursor-pointer w-3"
-              value={showPassword}
+              checked={showPassword}
               onChange={() => setShowPassword((prev) => !prev)}
             />
           </p>
@@ -120,33 +134,15 @@ const Login = () => {
           className="bg-primary text-white w-full py-2 my-2 rounded-md text-base hover:bg-gray-700 transition-all duration-500"
           disabled={loading}
         >
-          {loading
-            ? state === "Sign Up"
-              ? "Signing Up..."
-              : "Logging in..."
-            : state === "Sign Up"
-            ? "Sign Up"
-            : "Login"}
+          {loading ? (state === "Sign Up" ? "Signing Up..." : "Logging in...") : state === "Sign Up" ? "Sign Up" : "Login"}
         </button>
         {state === "Sign Up" ? (
           <p>
-            Already have an account?{" "}
-            <span
-              onClick={() => setState("Login")}
-              className="text-primary underline cursor-pointer"
-            >
-              Login here
-            </span>
+            Already have an account? <span onClick={() => setState("Login")} className="text-primary underline cursor-pointer">Login here</span>
           </p>
         ) : (
           <p>
-            Create an new account?{" "}
-            <span
-              onClick={() => setState("Sign Up")}
-              className="text-primary underline cursor-pointer"
-            >
-              Click here
-            </span>
+            Create a new account? <span onClick={() => setState("Sign Up")} className="text-primary underline cursor-pointer">Click here</span>
           </p>
         )}
       </div>

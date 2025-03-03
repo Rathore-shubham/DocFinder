@@ -13,6 +13,8 @@ import Appointment from './pages/Appointment'
 import Verify from './pages/Verify'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Dashboard from './pages/Dashboard'
+import Chatbot from './components/Chatbot'
 
 const App = () => {
   return (
@@ -30,7 +32,9 @@ const App = () => {
         <Route path='/my-appointments' element={<MyAppointments />}/>
         <Route path='/appointment/:docId' element={<Appointment />}/>
         <Route path='/verify' element={<Verify />} />
+        <Route path='/dashboard' element={<Dashboard />}/>
       </Routes>
+      <Chatbot />
       <Footer />
     </div>
   )

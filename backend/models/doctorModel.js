@@ -12,9 +12,19 @@ const doctorSchema = new mongoose.Schema({
     available: { type: Boolean, default: true },
     fees: { type: Number, required: true },
     slots_booked: { type: Object, default: {} },
-    address: { type: Object, required: true },
+    address: {
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        country: { type: String, required: true },
+        coordinates: { 
+            type: { type: String, enum: ['Point'], default: 'Point' },
+            coordinates: { type: [Number], required: true } // [longitude, latitude]
+        }
+    },
     date: { type: Number, required: true },
-}, { minimize: false })
+}, { minimize: false });
+
+doctorSchema.index({ "address.coordinates": "2dsphere" }); // Enable geospatial queries
 
 const doctorModel = mongoose.models.doctor || mongoose.model("doctor", doctorSchema);
 export default doctorModel;
