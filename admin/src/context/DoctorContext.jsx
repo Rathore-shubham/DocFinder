@@ -17,20 +17,22 @@ const DoctorContextProvider = (props) => {
     // Getting Doctor appointment data from Database using API
     const getAppointments = async () => {
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/doctor/appointments', { headers: { dToken } })
-
+            const { data } = await axios.get(backendUrl + '/api/doctor/appointments', { headers: { dToken } });
+    
+            // console.log("Frontend Appointments Data:", data);
+    
             if (data.success) {
-                setAppointments(data.appointments.reverse())
+                setAppointments(data.appointments.reverse());
             } else {
-                toast.error(data.message)
+                toast.error(data.message);
             }
-
+    
         } catch (error) {
-            console.log(error)
-            toast.error(error.message)
+            console.log(error);
+            toast.error(error.message);
         }
-    }
+    };
+    
 
     // Getting Doctor profile data from Database using API
     const getProfileData = async () => {

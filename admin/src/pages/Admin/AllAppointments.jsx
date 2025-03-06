@@ -7,7 +7,13 @@ import { AppContext } from "../../context/AppContext";
 const AllAppointments = () => {
   const { aToken, appointments, cancelAppointment, getAllAppointments } =
     useContext(AdminContext);
-  const { slotDateFormat, calculateAge, currency } = useContext(AppContext);
+    const { slotDateFormat, calculateAge, currency } = useContext(AppContext) || {};
+
+    if (!slotDateFormat || !calculateAge || !currency) {
+      console.error("AppContext is undefined! Ensure AppContextProvider is wrapping the component.");
+      return <div>Error: Context not available</div>;
+    }
+    
 
   useEffect(() => {
     if (aToken) {
@@ -23,7 +29,7 @@ const AllAppointments = () => {
         <div className="hidden text-white sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b">
           <p>#</p>
           <p>Patient</p>
-          <p>Age</p>
+          {/* <p>Age</p> */}
           <p>Date & Time</p>
           <p>Doctor</p>
           <p>Fees</p>
@@ -31,7 +37,7 @@ const AllAppointments = () => {
         </div>
         {appointments.map((item, index) => (
           <div
-            className="flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50"
+            className="flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-white py-3 px-6 border-b hover:bg-zinc-800 transition"
             key={index}
           >
             <p className="max-sm:hidden">{index + 1}</p>
@@ -43,10 +49,11 @@ const AllAppointments = () => {
               />{" "}
               <p>{item.userData.name}</p>
             </div>
-            <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
+            {/* <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p> */}
             <p>
-              {slotDateFormat(item.slotDate)}, {item.slotTime}
-            </p>
+  {slotDateFormat(item.date)}, {item.slotTime}
+</p>
+
             <div className="flex items-center gap-2">
               <img
                 src={item.docData.image}

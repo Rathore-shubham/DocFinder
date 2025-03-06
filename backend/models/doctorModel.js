@@ -15,13 +15,10 @@ const doctorSchema = new mongoose.Schema({
     address: {
         city: { type: String, required: true },
         state: { type: String, required: true },
-        country: { type: String, required: true },
-        coordinates: { 
-            type: { type: String, enum: ['Point'], default: 'Point' },
-            coordinates: { type: [Number], required: true } // [longitude, latitude]
-        }
-    },
-    date: { type: Number, required: true },
+        country: { type: String, required: true }
+      },
+       
+    // date: { type: Number, required: true },
 }, { minimize: false });
 
 doctorSchema.index({ "address.coordinates": "2dsphere" }); // Enable geospatial queries

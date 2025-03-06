@@ -12,13 +12,10 @@ const Chatbot = () => {
             messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages, isOpen]);
-
     const sendMessage = async () => {
         if (!input.trim()) return;
     
         const userMessage = { sender: "user", text: input };
-        
-        // Update messages state correctly
         setMessages((prevMessages) => [...prevMessages, userMessage]);
     
         try {
@@ -31,6 +28,7 @@ const Chatbot = () => {
     
         setInput("");
     };
+    
     
 
     return (
@@ -63,7 +61,7 @@ const Chatbot = () => {
                                 className={`p-2 my-1 rounded-lg text-sm max-w-[80%] ${
                                     msg.sender === "user"
                                         ? "bg-blue-500 text-white self-end ml-auto"
-                                        : "bg-green-500 text-white self-start mr-auto"
+                                        : "bg-zinc-800 text-white self-start mr-auto"
                                 }`}
                             >
                                 {msg.text}

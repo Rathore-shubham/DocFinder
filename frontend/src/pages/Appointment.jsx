@@ -20,6 +20,11 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
   const [loading, setLoading] = useState(true);
+  const addressParts = typeof docInfo?.address === "string" ? docInfo.address.split(", ") : [];
+  const city = addressParts[0] || "N/A";
+  const state = addressParts[1] || "N/A";
+  const country = addressParts[2] || "N/A";
+  
 
   // Fetch doctor info
   const fetchDocInfo = useCallback(() => {
@@ -204,8 +209,7 @@ const Appointment = () => {
               <img className="w-4 bg-white" src={assets.location_icon} alt="" />
             </p>
             <p className="text-sm text-white max-w-[700px] mt-1">
-              {docInfo.address.city}, {docInfo.address.state},{" "}
-              {docInfo.address.country}
+            {city}, {state}, {country}
             </p>
           </div>
 

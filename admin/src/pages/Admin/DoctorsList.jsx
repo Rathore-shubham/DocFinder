@@ -36,7 +36,7 @@ const DoctorsList = () => {
       <h1 className="text-lg font-medium">All Doctors</h1>
 
       {/* Location Filter Input */}
-      <div className="flex gap-2 mt-3">
+      {/* <div className="flex gap-2 mt-3">
         <input
           type="text"
           className="border p-2 rounded bg-zinc-800 text-white"
@@ -51,13 +51,13 @@ const DoctorsList = () => {
         >
           {searching ? 'Searching...' : 'Search'}
         </button>
-      </div>
+      </div> */}
 
       {/* Doctors List */}
       <div className="w-full flex flex-wrap gap-4 pt-5 gap-y-6">
         {(filteredDoctors.length > 0 ? filteredDoctors : doctors).map((doctor, index) => (
           <div
-            className="border border-[#C9D8FF] rounded-xl max-w-56 overflow-hidden cursor-pointer group bg-gray-900 p-4 text-white"
+            className="border border-[#C9D8FF] rounded-xl max-w-56 overflow-hidden cursor-pointer group bg-gray-800 p-4 text-white"
             key={index}
           >
             <img

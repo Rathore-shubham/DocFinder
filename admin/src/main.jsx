@@ -9,12 +9,12 @@ import AppContextProvider from './context/AppContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <AdminContextProvider>
-      <DoctorContextProvider>
-        <AppContextProvider>
+    <AppContextProvider> {/* Move AppContextProvider to the top */}
+      <AdminContextProvider>
+        <DoctorContextProvider>
           <App />
-        </AppContextProvider>
-      </DoctorContextProvider>
-    </AdminContextProvider>
-  </BrowserRouter>,
-)
+        </DoctorContextProvider>
+      </AdminContextProvider>
+    </AppContextProvider>
+  </BrowserRouter>
+);

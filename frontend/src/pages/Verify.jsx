@@ -5,40 +5,47 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Verify = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const success = searchParams.get("success");
+  const [searchParams] = useSearchParams();
+  const success = searchParams.get("success") || "false";
   const appointmentId = searchParams.get("appointmentId");
 
   const { backendUrl, token } = useContext(AppContext);
-
   const navigate = useNavigate();
 
-  const verifyStripe = async () => {
-    try {
-      const { data } = await axios.post(
-        "http://localhost:4000/api/user/verifyStripe",
-        { success, appointmentId },
-        { headers: { token } }
-      );
-      if (data.success) {
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
-
-      navigate("/my-appointments");
-    } catch (error) {
-      toast.error(error.message);
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    if ((token, appointmentId, success)) {
-      verifyStripe();
+    if (!appointmentId) {
+      console.error("❌ appointmentId is missing from URL");
+      navigate("/my-appointments");  // Redirect if no appointment ID
+      return;
     }
-  }, [token]);
+
+    const verifyStripe = async () => {
+      try {
+        console.log("🔍 Verifying Stripe payment...", { success, appointmentId });
+
+        const { data } = await axios.post(
+          `${backendUrl}/api/user/verifyStripe`,
+          { success, appointmentId },
+          { headers: { token } }
+        );
+
+        console.log("✅ API Response:", data);
+
+        if (data.success) {
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+
+        navigate("/my-appointments");
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+        console.error("❌ API Error:", error);
+      }
+    };
+
+    verifyStripe();
+  }, [token, appointmentId, success, backendUrl, navigate]);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center">

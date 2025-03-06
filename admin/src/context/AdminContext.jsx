@@ -17,21 +17,21 @@ const AdminContextProvider = (props) => {
 
     // Getting all Doctors data from Database using API
     const getAllDoctors = async () => {
-
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/admin/all-doctors', { headers: { aToken } })
+            const { data } = await axios.get(backendUrl + "/api/admin/all-doctors", {
+                headers: { Authorization: `Bearer ${aToken}` },
+            });
+    
             if (data.success) {
-                setDoctors(data.doctors)
+                setDoctors(data.doctors);
             } else {
-                toast.error(data.message)
+                toast.error(data.message);
             }
-
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
-
-    }
+    };
+    
 
     // Function to change doctor availablity using API
     const changeAvailability = async (docId) => {
@@ -54,62 +54,70 @@ const AdminContextProvider = (props) => {
 
     // Getting all appointment data from Database using API
     const getAllAppointments = async () => {
-
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { aToken } })
+            const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
+                headers: { Authorization: `Bearer ${aToken}` },
+            });
+    
             if (data.success) {
-                setAppointments(data.appointments.reverse())
+                setAppointments(data.appointments.reverse());
             } else {
-                toast.error(data.message)
+                toast.error(data.message);
             }
-
         } catch (error) {
-            toast.error(error.message)
-            console.log(error)
+            toast.error(error.message);
+            console.log(error);
         }
-
-    }
-
+    };
+    
     // Function to cancel appointment using API
     const cancelAppointment = async (appointmentId) => {
-
         try {
-
-            const { data } = await axios.post(backendUrl + '/api/admin/cancel-appointment', { appointmentId }, { headers: { aToken } })
-
+            const { data } = await axios.post(
+                backendUrl + "/api/admin/cancel-appointment",
+                { appointmentId },
+                {
+                    headers: { Authorization: `Bearer ${aToken}` },
+                }
+            );
+    
             if (data.success) {
-                toast.success(data.message)
-                getAllAppointments()
+                toast.success(data.message);
+                getAllAppointments();
             } else {
-                toast.error(data.message)
+                toast.error(data.message);
             }
-
         } catch (error) {
-            toast.error(error.message)
-            console.log(error)
+            toast.error(error.message);
+            console.log(error);
         }
-
-    }
+    };
+    
 
     // Getting Admin Dashboard data from Database using API
     const getDashData = async () => {
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
-
-            if (data.success) {
-                setDashData(data.dashData)
-            } else {
-                toast.error(data.message)
+            const token = localStorage.getItem("aToken"); // Retrieve stored token
+            if (!token) {
+                toast.error("No token found. Please login.");
+                return;
             }
-
+    
+            const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
+                headers: { Authorization: `Bearer ${token}` }, // Correct format
+            });
+    
+            if (data.success) {
+                setDashData(data.dashData);
+            } else {
+                toast.error(data.message);
+            }
         } catch (error) {
-            console.log(error)
-            toast.error(error.message)
+            console.log(error);
+            toast.error(error.response?.data?.message || "Error fetching data");
         }
-
-    }
+    };
+    
 
     const value = {
         aToken, setAToken,

@@ -12,22 +12,37 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [usernameExists, setUsernameExists] = useState(false);
 
   const navigate = useNavigate();
   const { token, setToken } = useContext(AppContext);
 
-  const validateUsername = (name) => {
-    return !name.includes("-");
+  const validateUsername = (name) => /^[A-Za-z]+$/.test(name); // Ensures only letters
+
+  const checkUsernameAvailability = async (username) => {
+    try {
+      const { data } = await axios.get(`http://localhost:4000/api/user/check-username/${username}`);
+      setUsernameExists(data.exists);
+    } catch (error) {
+      console.error("Error checking username:", error);
+    }
   };
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
 
-    if (state === "Sign Up" && !validateUsername(name)) {
-      toast.error("Username should not contain hyphens (-).");
-      setLoading(false);
-      return;
+    if (state === "Sign Up") {
+      if (!validateUsername(name)) {
+        toast.error("Username should only contain letters.");
+        setLoading(false);
+        return;
+      }
+      if (usernameExists) {
+        toast.error("Username already exists. Please choose another one.");
+        setLoading(false);
+        return;
+      }
     }
 
     try {
@@ -57,18 +72,17 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-
-      if (error.response) {
-        toast.error(error.response.data.message || "Something went wrong!");
-      } else if (error.request) {
-        toast.error("No response from server. Please check your backend.");
-      } else {
-        toast.error(error.message);
-      }
+      toast.error(error.response?.data.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (name.trim() !== "") {
+      checkUsernameAvailability(name);
+    }
+  }, [name]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -96,6 +110,7 @@ const Login = () => {
               type="text"
               required
             />
+            {usernameExists && <p className="text-red-500 text-xs">Username already exists</p>}
           </div>
         )}
 
